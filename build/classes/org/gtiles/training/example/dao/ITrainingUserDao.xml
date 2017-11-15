@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gtiles.training.example.dao.ITrainingUserDao">
+
+	<resultMap type="org.gtiles.training.example.bean.TrainingUser" id="resultMap">
+		<id column="TRAINING_USER_ID" property="trainingUserId" />
+		<result column="NAME" property="name" />
+		<result column="DEPT" property="dept" />
+		<result column="MOBILE_PHONE" property="mobilePhone" />
+		<result column="EMAIL" property="email" />
+		<result column="CREATE_TIME" property="createTime"/>
+	</resultMap>
+	<sql id="trainingUserCols">
+		 TRAINING_USER_ID,
+		 NAME,
+		 DEPT,
+		 MOBILE_PHONE,
+		 EMAIL,
+		 CREATE_TIME
+	</sql>
+	<sql id="trainingUserProps">
+		#{trainingUserId},
+		#{name},
+		#{dept},
+		#{mobilePhone},
+		#{email},
+		#{createTime}
+	</sql>
+	<!-- 翻页查询 -->
+	<select id="findListByPage" resultMap="resultMap">
+		select <include refid="trainingUserCols"></include> from TRAINING_USER
+		<where>
+			<if test="query.queryName!=null and query.queryName!=''">
+			 	<bind name="queryName" value="'%'+query.queryName+'%'"/>
+			 </if>
+		</where>
+	</select>
+	<!-- 添加培训用户 -->
+	<insert id="addTrainingUser" useGeneratedKeys="true" keyProperty="trainingUserId" parameterType="org.gtiles.training.example.bean.TrainingUser">
+		<selectKey resultType="String" keyProperty="trainingUserId" order="BEFORE">
+			select uuid()
+		</selectKey>
+		insert into TRAINING_USER(<include refid="trainingUserCols"></include>) values (<include refid="trainingUserProps"></include>);
+	</insert>
+	<!-- 更新培训用户 -->
+	<update id="updateTrainingUser" parameterType="org.gtiles.training.example.bean.TrainingUser">
+		update TRAINING_USER 
+		<set>
+			<if test="name != null">NAME = #{name},</if>
+			<if test="dept != null">DEPT = #{dept},</if>
+			<if test="mobilePhone != null">MOBILE_PHONE = #{mobilePhone},</if>
+			<if test="email != null">EMAIL = #{email},</if>
+		</set>
+		where TRAINING_USER_ID=#{trainingUserId}
+	</update>
+	<!-- 删除培训用户数据 -->
+	<delete id="deleteByIds">
+		delete form TRAINING_USER where TRAINING_USER_ID in 
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			id
+		</foreach>
+	</delete>
+	<!-- 查询培训用户 -->
+	<select id="findById" resultMap="resultMap">
+		select <include refid="trainingUserCols"></include> from TRAINING_USER
+		where TRAINING_USER_ID=#{id}
+	</select>
+</mapper>

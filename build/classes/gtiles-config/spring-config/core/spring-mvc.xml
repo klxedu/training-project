@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.2.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+http://www.springframework.org/schema/util
+http://www.springframework.org/schema/util/spring-util-4.2.xsd
+http://www.springframework.org/schema/websocket
+http://www.springframework.org/schema/websocket/spring-websocket-4.2.xsd">
+
+
+	<mvc:resources location="/" mapping="/**/*.js" />
+	<mvc:resources location="/images/" mapping="/images/**" />
+	<mvc:resources location="/" mapping="/**/*.jpg" />
+	<mvc:resources location="/" mapping="/**/*.gif" />
+	<mvc:resources location="/" mapping="/**/*.png" />
+	<mvc:resources location="/" mapping="/**/*.html" />
+	<mvc:resources location="/**" mapping="/**/*.jsp" />
+	<mvc:resources location="/" mapping="/*.ico" />
+	<mvc:resources location="/skin/" mapping="/skin/**" />
+	<mvc:resources location="/common/" mapping="/common/**" />
+	<mvc:resources location="/adminconsole/" mapping="/adminconsole/**" />
+	<mvc:resources location="/workbench/" mapping="/workbench/**" />
+
+	<mvc:resources location="/" mapping="/**/*.css" />
+	<mvc:resources location="/" mapping="/**/*.swf" />
+
+	<mvc:resources location="/" mapping="/**/*.ttf" />
+	<mvc:resources location="/" mapping="/**/*.eot" />
+	<mvc:resources location="/" mapping="/**/*.svg" />
+	<mvc:resources location="/" mapping="/**/*.woff" />
+
+
+	<mvc:annotation-driven conversion-service="conversionService">
+		<mvc:argument-resolvers>
+			<bean class="org.gtiles.core.web.resolver.ModelQueryResolver" />
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<!-- <mvc:mapping path="/**/add*.*"/> <mvc:mapping path="/**/update*.*"/> -->
+			<bean class="org.gtiles.core.web.interceptor.WebInterceptor">
+				<property name="requestHandlers">
+					<array>
+						<!-- <bean class="org.gtiles.core.web.interceptor.handler.impl.RemoteModuleCallHandler" 
+							/> -->
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.ValidationHandler" />
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.RepeatSubmitCheckHandler" />
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.RequestHolderHandler" />
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.AuditRecordHandler" />
+<!-- 						<bean -->
+<!-- 							class="org.gtiles.core.web.interceptor.handler.impl.LocaleChangeHandler" /> -->
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.FreemarkModelHandler" />
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.ClientMessageHandler" />
+						<bean
+							class="org.gtiles.core.web.interceptor.handler.impl.XssFilterHandler" />
+					</array>
+				</property>
+			</bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/adminconsole/**" />
+			<bean class="org.gtiles.core.module.adminconsole.web.SecurityInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- 上传文件拦截，设置最大上传文件大小 10M=10*1024*1024(B)=10485760 bytes -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="-1" />
+	</bean>
+	
+	<bean id="contentNegotiationManager"
+		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorParameter" value="false" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+			</map>
+		</property>
+	</bean>
+	<!-- xss配置 -->
+	<bean id="XssConfiguration" class="org.gtiles.core.web.xss.XssConfiguration"></bean>
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
+		<property name="defaultViews">
+			<list>
+				<bean class="org.gtiles.core.web.json.GTilesJacksonView">
+					<property name="nullValue">
+						<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+					</property>
+					<!-- 以下配置是默认的，除非想手动修改，否则不用配置 -->
+					<!-- <property name="jsonpParameterNames"> <set> <value>jsonp</value> 
+						<value>callback</value> </set> </property> -->
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- htmlEscaping add by songhq at 20170607 -->
+<!-- 	<bean id="htmlEscapingObjectMapper" -->
+<!-- 		class="org.gtiles.core.web.json.HtmlEscapingObjectMapperFactory" /> -->
+<!-- 	<mvc:annotation-driven> -->
+<!-- 		<mvc:message-converters> -->
+<!-- 			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"> -->
+<!-- 				<property name="objectMapper" ref="htmlEscapingObjectMapper"/> -->
+<!-- 			</bean> -->
+<!-- 		</mvc:message-converters> -->
+<!-- 	</mvc:annotation-driven> -->
+
+	<!-- <bean id="freemarkerConfiguration" class="org.springframework.beans.factory.config.PropertiesFactoryBean"> 
+		<property name="location" value="classpath:freemarker.properties" /> </bean> -->
+
+	<!-- 配置freeMarker的模板路径 -->
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<!--property name="freemarkerSettings" ref="freemarkerConfiguration"/ -->
+		<property name="templateLoaderPaths">
+			<list>
+				<value>/WEB-INF/ftls/</value>
+				<value>classpath:org/gtiles/</value>
+			</list>
+		</property>
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="defaultEncoding">UTF-8</prop>
+				<prop key="url_escaping_charset">UTF-8</prop>
+			</props>
+		</property>
+		<!-- <property name="freemarkerVariables"> <map> <entry key="xml_escape" 
+			value-ref="fmXmlEscape" /> </map> </property> -->
+	</bean>
+
+	<!-- <bean id="fmXmlEscape" class="freemarker.template.utility.XmlEscape" 
+		/> -->
+
+	<!-- 配置freeMarker视图解析器 -->
+	<bean id="freemarkerViewResolver"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="viewClass"
+			value="org.gtiles.core.web.freemarker.GTilesFreeMarkerView" />
+		<!-- <property name="viewNames" value=".ftl" /> -->
+		<property name="contentType" value="text/html; charset=utf-8" />
+		<property name="cache" value="true" />
+		<!-- <property name="prefix" value="" /> <property name="suffix" value="" 
+			/> -->
+		<property name="order" value="1" />
+	</bean>
+
+	<bean id="jspViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="2" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<!-- <property name="suffix" value=".jsp"></property> -->
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+	</bean>
+
+	<!-- <websocket:handlers> <websocket:mapping path="/myHandler" handler="myHandler"/> 
+		</websocket:handlers> <bean id="myHandler" class="org.gtiles.core.web.websocket.WebSocketMessageHandler"/> -->
+
+</beans>

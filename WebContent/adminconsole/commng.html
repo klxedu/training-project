@@ -1,0 +1,158 @@
+<ol class="breadcrumb">
+	<li></li>
+</ol>
+<div>
+	<!-- 按钮区域 -->
+	<div class="btn-group btn-group-sm">
+		<span class="btn btn-default " ng-click="my_tree.expand_all()">
+			<span class="glyphicon glyphicon-collapse-down"></span>
+			全部展开
+		</span>
+		<span class="btn btn-default " ng-click="my_tree.collapse_all()">
+			<span class="glyphicon glyphicon-expand"></span>
+			全部收齐
+		</span>
+		<span class="btn btn-default" ng-click="updatelic()">
+			<span class="glyphicon glyphicon-import"></span>
+			更新授权
+		</span>
+	</div>
+	<div style="border: 1px solid #ccc;margin-top: 15px;">
+		<tree-grid 
+	       	tree-data="tree_data" 
+	       	expand-level="2" 
+	       	expand-on="expand_to" 
+	       	template-url="../adminconsole/treegrid/treeGridTpl.html" 
+	       	tree-control="my_tree"  
+	       	on-state-change="onStateChange(branch,callback)" 
+	       	on-tree-rank="onTreeRank(branch,fixedVal,callback)" 
+	       	on-branch-operation="onBranchOperation(branch,operate_type,callback)"  
+	       	col-defs="col_defs">
+	       </tree-grid>
+	</div>
+</div>
+
+<!-- 组件参数配置 -->
+<div id="compontentConfig" class="modal fade lg-Modal" tabindex="-1"
+	role="dialog" aria-labelledby="LargeModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">{{currentCheckItem.name}}参数配置信息</h4>
+			</div>
+			<form method="post" class="form-horizontal" ng-submit="saveConfig()">
+				<div class="modal-body">
+					<div ng-repeat="config in currentCheckItem.configList">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">{{config.name}}</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" ng-model="config.value">
+							</div>
+						</div>
+						<div class="hr-line-dashed"></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">保存</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- 组件版本变更记录 -->
+<div id="versionChangeLog" class="modal fade lg-Modal" tabindex="-1"
+	role="dialog" aria-labelledby="LargeModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">{{currentCheckItem.name}}变更记录</h4>
+			</div>
+			<div class="modal-body">
+				<ul class="list-group" ng-repeat="item in currentCheckItem.changeLog">
+					<li class="list-group-item active"><strong>v{{item.version}}</strong></li> 
+					<li class="list-group-item" ng-if="item.versionItems==null || item.versionItems.length==0">该版本无内容更新</li>
+					<li class="list-group-item" ng-repeat="logrecord in item.versionItems track by $index"><strong>{{$index+1}}.</strong>{{logrecord}}</li>
+					<div class="hr-line-dashed"></div>
+				</ul>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--更新授权-->
+<div id="updatelic" class="modal fade lg-Modal" tabindex="-1"
+	role="dialog" aria-labelledby="LargeModal">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">更新授权<span class="text-danger">{{licError}}</span></h4>
+			</div>
+			<div class="modal-body">
+				<div class="wrapper wrapper-content animated fadeInRight">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="ibox float-e-margins">
+								<div class="ibox-content">
+									<form method="post" class="form-horizontal ng-pristine ng-valid">
+										<!--文件名及错误信息及文件选择和确认上传-->
+										<div class="form-group">
+											<label class="col-sm-2 control-label">文件名称：</label>
+											<label class="col-sm-6  control-label ng-binding" style="text-align: left">{{file.name}}</label>
+											<div class="col-sm-2 ">
+												<div class="btn btn-primary   ng-pristine ng-untouched ng-valid ng-empty" ngf-select="" ng-model="file" name="file" ngf-max-size="20MB" ngf-min-height="100">选择文件</div>
+											</div>
+											<div class="col-sm-2 ">
+												<button class="btn btn-success" type="button" ng-click="uploadLic()" ng-disabled="!file.name" disabled="disabled">确认上传</button>
+											</div>
+										</div>
+										<div class="hr-line-dashed"></div>
+										<!-- 进度条-->
+										<div class="form-group">
+											<div class="col-sm-12">
+												<div class="progress ">
+													<div class="progress-bar progress-bar-info " role="progressbar" ng-style="barstyle"></div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-12 ng-binding" style="color: red;"></div>
+										</div>
+										<div class="hr-line-dashed"></div>
+										<!--确认 上传 -->
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+  $(function(){
+    var modelheight=$(window).height()-180;
+    $('.modal-body').css({'max-height':modelheight,'overflow-y':'scroll'});
+  });
+</script>

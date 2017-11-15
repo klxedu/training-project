@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- 定义angular的模块作用域范围 -->
+<html ng-app="Module.step2">
+<head>
+	<meta charset="UTF-8">
+	<title>step2 angularJs入门实践</title>
+	<script type="text/javascript" src="../../common/angularjs/angular-1.5.0.min.js"></script>
+	<script type="text/javascript" src="../../common/jquery/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="../../common/bootstrap/bootstrap-3.3.5.min.js"></script>
+	<script type="text/javascript" src="./step2.js"></script>
+	<link href="../../skin/bootstrap/css/bootstrap-3.3.5.min.css" rel="stylesheet">
+</head>
+<!-- 定义界面使用的controller -->
+<body ng-controller="step2Ctrl">
+<div class="container">
+	<div class="row">
+		<h1>angularJs入门实践</h1>
+	</div>
+	<div class="row">
+		<h2>指令实现</h2>
+		<div class="text-danger">ng-repeat指令</div>
+		<table class="table">
+			<tr>
+				<th>姓名</th>
+				<th>部门</th>
+				<th>手机号</th>
+				<th>邮箱</th>
+				<th>创建时间</th>
+			</tr>
+			<tr ng-repeat="x in list">
+				<td>{{x.name}}</td>
+				<td>{{x.dept}}</td>
+				<td>{{x.mobilePhone}}</td>
+				<td>{{x.email}}</td>
+				<!-- 日期过滤器 -->
+				<td>{{x.createTime | date:"yyyy-MM-dd HH:mm:ss"}}</td>
+			</tr>
+		</table>
+		<div class="text-danger">ng-if指令</div>
+		<form class="form-horizontal">
+			<div class="form-group">
+				<div class="col-md-9" ng-init="showEmail=true">
+    				<input ng-if="showEmail" type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+				</div>
+				<div class="col-md-3">
+					<input type="button" class="btn btn-primary" ng-click="showEmail=!showEmail" value="显示/隐藏"/>
+				</div>
+			</div>
+		</form>
+		<div class="text-danger">ng-init及ng-model指令</div>
+		<form class="form-horizontal">
+			<div class="form-group">
+				<div class="col-md-9">
+					<label class="col-sm-9 control-label">{{ngInitData}}</label>
+    				<input class="form-control" ng-model="ngInitData" ng-init="ngInitData='ng-init指令初始化'" placeholder="请输入内容">
+				</div>
+			</div>
+		</form>
+		<div class="text-danger">ng-show及ng-hide指令</div>
+		<form class="form-horizontal">
+			<div class="form-group">
+				<div class="col-md-9" ng-init="showPhone=true">
+    				<input ng-show="showPhone" type="text" class="form-control" placeholder="mobile">
+				</div>
+				<div class="col-md-3">
+					<input type="button" class="btn btn-primary" ng-click="showPhone=!showPhone" value="显示/隐藏"/>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="row">
+		
+	</div>
+</div>
+	
+</body>
+</html>

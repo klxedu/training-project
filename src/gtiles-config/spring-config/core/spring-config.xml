@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.2.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util-4.2.xsd
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.2.xsd ">
+
+	<context:property-placeholder location="classpath:config.properties"/>
+	
+	<context:component-scan base-package="org.gtiles" />
+	
+	<bean id="messageSource" class="org.gtiles.core.messages.GTilesMessageSource" >
+		<property name="basenames">
+			<array>
+				<value>/org.gtiles/**/messages</value>
+			</array>
+		</property>
+	</bean>
+	
+	<!-- <bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
+		<property name="defaultLocale" value="zh_CN" />
+	</bean> -->
+	
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver" >
+		<property name="cookieName" value="clientLanguage" />
+		<property name="cookieMaxAge" value="100000" />
+		<property name="cookiePath" value="/" />
+		<property name="defaultLocale" value="zh_CN" />
+	</bean>
+
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler"></bean>
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"  />
+    </bean>
+	<bean id="MyBatisSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="databaseIdProvider" ref="databaseIdProvider"/>
+		<!-- <property name="mapperLocations">
+			<list>
+				<value>classpath*:/org.gtiles/**/*.xml</value>
+			</list>
+		</property> -->
+		<property name="plugins">
+	        <array>
+	            <bean class="org.gtiles.core.dao.mybatis.interceptor.PrepareStatementInterceptor"/>
+	        </array>
+    	</property>
+	</bean>
+	<!-- myBatis plugins初始化 工厂 -->
+<!-- 	<bean id="myBatisPlugins" factory-bean="myBatisPluginsFactory" factory-method="init"/> -->
+<!-- 	<bean id="myBatisPluginsFactory" class="org.gtiles.core.dao.mybatis.PluginsInitFactory"/> -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="org.gtiles" />
+		<property name="nameGenerator">
+			<bean class="org.gtiles.core.dao.mybatis.MyBatisMapperNameGenerator"/>
+		</property>
+		<property name="sqlSessionFactoryBeanName" value="MyBatisSqlSessionFactory" />
+		<property name="annotationClass" value="org.gtiles.core.dao.mybatis.annotation.MybatisRepository" />
+	</bean>
+	
+	<bean id="vendorProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+	    <property name="properties">
+	        <props>
+	            <prop key="SQL Server">sqlserver</prop>
+	            <prop key="DB2">db2</prop>
+	            <prop key="Oracle">oracle</prop>
+	            <prop key="MySQL">mysql</prop>
+	        </props>
+	    </property>
+	</bean>
+	
+	<bean id="databaseIdProvider" class="org.apache.ibatis.mapping.VendorDatabaseIdProvider">
+	    <property name="properties" ref="vendorProperties"/>
+	</bean>
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager" order="1"/>
+	
+	<aop:aspectj-autoproxy />
+    
+    <aop:config >
+		<aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* org..service.impl.*.*(..))" order="2"/>
+	</aop:config>
+	
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+		    <tx:method name="del*" />
+		    <tx:method name="delete*" />
+		    <tx:method name="update*" />
+		    <tx:method name="add*" />
+		    <tx:method name="save*" />
+		    <tx:method name="modify*" />
+		    <tx:method name="generate*" />
+		    <tx:method name="do*" />
+			<tx:method name="*"    read-only="true"/>
+		</tx:attributes>
+    </tx:advice>
+    
+    <!--
+    	缓存配置，支持内存缓存实现org.gtiles.core.cache.impl.MapCacheImpl和Redis缓存实现 org.gtiles.core.cache.impl.RedisCacheImpl
+    -->
+    <bean id="gtilesCache" class="org.gtiles.core.cache.impl.MapCacheImpl"/>
+    
+    
+<!--     <bean id="remoteRequestPloyCenter" class="org.gtiles.core.web.remotecall.RemoteRequestPloyCenter"> -->
+<!-- 		<property name="requestProcessors"> -->
+<!-- 			<array> -->
+<!-- 				<bean class="org.gtiles.core.web.remotecall.impl.WebServiceRequestProcessor" /> -->
+<!-- 				<bean class="org.gtiles.core.web.remotecall.impl.HttpUrlRequestProcessor" /> -->
+<!-- 			</array> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+    <!-- WebService服务配置，采用独立的Http Server接收请求。默认为关闭，如需开启，放开下面的注释即可  -->
+	<!--<bean class="org.gtiles.core.web.webservice.WebServiceResourceLoader"/>
+	<bean class="org.springframework.remoting.jaxws.SimpleHttpServerJaxWsServiceExporter">  
+        <property name="server" ref="WebServiceServer" />
+		<property name="basePath" value="${webService-serverBasePath}" />
+		<property name="authenticator">
+			<bean class="org.gtiles.core.web.webservice.authenticator.AccessAuthenticator"></bean>
+		</property>
+    </bean>
+	<bean id="WebServiceServer" class="org.springframework.remoting.support.SimpleHttpServerFactoryBean">
+	    <property name="port" value="${webService-serverPort}" />
+	</bean>  -->
+    
+    <!-- 线程池对象，目前服务于框架的异步操作。默认为关闭，如需开启，放开下面的注释即可 -->
+    <!--<bean id="TaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="3"/>
+		<property name="maxPoolSize" value="10"/>
+	</bean> -->
+
+	<!-- redis作为缓存使用 -->
+	<!--
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxIdle" value="${redis.maxIdle}" />
+        <property name="maxTotal" value="${redis.maxTotal}" />
+        <property name="maxWaitMillis" value="${redis.maxWaitMillis}" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}" />
+    </bean>
+
+	<bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="poolConfig" ref="jedisPoolConfig" />
+        <property name="hostName" value="${redis.host}" />
+        <property name="port" value="${redis.port}" />
+        <property name="password" value="${redis.password}" />
+    </bean>
+
+    <bean class="org.gtiles.core.cache.redis.GTilesRedisTemplate" >
+        <property name="connectionFactory" ref="jedisConnectionFactory" />
+    </bean>
+     -->
+
+</beans>
