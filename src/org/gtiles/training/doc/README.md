@@ -16,7 +16,7 @@
 
 ### step2 angularJs入门实践
 
-> 请访问以下地址： **http://localhost:8080/training/html/step2/index.html**，本节主要对angularJs的基本指令进行熟悉
+> 请访问以下地址：  **http://localhost:8080/training/html/step2/index.html** ，本节主要对angularJs的基本指令进行熟悉
 
 **练习**
 - **ng-repeat** 指令，主要进行列表循环。
@@ -30,11 +30,11 @@
 
 ### step3 angularJs使用$http与服务端集成实践
 
-> 请访问以下地址： **http://localhost:8080/training/html/step3/index.html**，本节主要对angularJs与服务端集成过程进行熟悉
+> 请访问以下地址：  **http://localhost:8080/training/html/step3/index.html** ，本节主要对angularJs与服务端集成过程进行熟悉
 
 #### $http服务
 
-> $http是angularJs的一个核心服务，用于读取远程服务器的数据。和jquery的ajax方法原理一致。$http的语法详情可见 **http://www.runoob.com/angularjs/angularjs-http.html**。本章特地说明，$http的post请求发送一个对象，不是标准的表单提交请求格式。发送的是一个playload请求，数据对象是json。后台想要接收的话，必须使用**@RequestBody**接收。这显然不是我们想要的。目前的处理方式如下：其中data要通过jquery的param方法进行转换，增加表单提交请求头。
+> $http是angularJs的一个核心服务，用于读取远程服务器的数据。和jquery的ajax方法原理一致。$http的语法详情可见  **http://www.runoob.com/angularjs/angularjs-http.html** 。本章特地说明，$http的post请求发送一个对象，不是标准的表单提交请求格式。发送的是一个playload请求，数据对象是json。后台想要接收的话，必须使用 **@RequestBody** 接收。这显然不是我们想要的。目前的处理方式如下：其中data要通过jquery的param方法进行转换，增加表单提交请求头。
 
 ```js
 $http({
@@ -54,7 +54,7 @@ $http({
 
 ### step4 angularJs路由实践
 
-> 请访问以下地址： **http://localhost:8080/training/html/step4/index.html#/**，本节主要对angularJs单页面特性进行熟悉
+> 请访问以下地址：  **http://localhost:8080/training/html/step4/index.html#/** ，本节主要对angularJs单页面特性进行熟悉
 
 > AngularJS 路由允许我们通过不同的 URL 访问不同的内容。通过 AngularJS 可以实现多视图的单页Web应用（single page web application，SPA）。通常我们的URL形式为 http://runoob.com/first/page，但在单页Web应用中 AngularJS 通过 # + 标记 实现，例如：
 
@@ -74,7 +74,7 @@ http://runoob.com/#/third
 
 ### step5 angularJs指令及过滤器实践
 
-> 请访问以下地址： **http://localhost:8080/training/html/step5/index.html#/**，本节主要对angularJs自定义指令和过滤器进行熟悉
+> 请访问以下地址：  **http://localhost:8080/training/html/step5/index.html#/** ，本节主要对angularJs自定义指令和过滤器进行熟悉
 
 #### 指令含义
 
@@ -88,12 +88,12 @@ http://runoob.com/#/third
 - ng-app 指令初始化一个 AngularJS 应用程序。
 - ng-init 指令初始化应用程序数据。
 - ng-model 指令把元素值（比如输入域的值）绑定到应用程序。
-- 具体指令及事件请参考 **http://www.runoob.com/angularjs/angularjs-reference.html**
+- 具体指令及事件请参考 **http://www.runoob.com/angularjs/angularjs-reference.html** 
 
 #### 过滤器说明
 
 - 过滤器可以使用一个管道字符（|）添加到表达式和指令中。
-- 内置的过滤器有 currency、filter、lowercase、orderBy、uppercase，详见 **http://www.runoob.com/angularjs/angularjs-filters.html**
+- 内置的过滤器有 currency、filter、lowercase、orderBy、uppercase，详见 **http://www.runoob.com/angularjs/angularjs-filters.html** 
 - 用户可以自定义过滤器，具体方式请参考示例
 
 **练习**
