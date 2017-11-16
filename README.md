@@ -141,6 +141,14 @@ INSERT INTO `gt_auth_resource` (`RESOURCE_ID`, `RESOURCE_NAME`, `RESOURCE_CODE`,
 ```
 - 创建UIState类（如不存在），具体定义过程及含义，参照**ExampleMenuUIState**。
 - 根据UIState中的内容创建界面文件，参照**example/index.html example/exampleService.js example/exampleCtrl.js**，其中angular的模块定义语句的js必须优先引用。
-- **特别声明：**angularJs，请按照mvc的结构思路进行理解，.html是视图层，效果展示；.xxxCtrl.js是控制层，主要和html进行交互，xxxService.js是模型层，主要控制与服务器进行数据交互。
+- **特别声明：** angularJs，请按照mvc的结构思路进行理解，.html是视图层，效果展示；.xxxCtrl.js是控制层，主要和html进行交互，xxxService.js是模型层，主要控制与服务器进行数据交互。
 - 后台管理端访问地址：[http://localhost:8080/training/workbench/index.html](http://localhost:8080/training/workbench/index.html)，用户名/密码：admin/111111
 ![产品平台功能效果](./files/产品平台功能效果.png)
+
+### step7 最终交付
+
+**交付要求**
+- 以 **angularJs在产品中使用实践** 为主，包含单表功能的维护操作（列表查询、新增、修改、删除，列表可根据查询条件查询）
+- 在功能中加入自定义的指令和过滤器实现，将新增功能使用指令实现，列表名称定义超长省略过滤器截取。
+- 交付结果中，要包含对整个培训过程的个人理解，及前后台工作过程整理，分析问题过程等。
+
