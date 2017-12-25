@@ -1,3 +1,9 @@
+## 环境搭建
+
+- 将git项目获取到本地
+- 将files目录中的training_2018-03-30.lic复制到eclipse的安装目录中。
+- ER图见files/培训人员管理.DM1
+
 ## 后端开发培训过程
 
 ### step1 SSM实践
